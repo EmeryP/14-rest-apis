@@ -27,10 +27,15 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
 // API Endpoints
+// app.get('/api/v1/books/find/')
+
 app.get('/api/v1/admin', (req, res) => res.send(TOKEN === parseInt(req.query.token)))
 
 app.get('/api/v1/books/find', (req, res) => {
   let url = 'https://www.googleapis.com/books/v1/volumes';
+  // superagent.get(url)
+  //   .set('Authoriation', `token ${process.env.GOOGLE_API_KEY}`)
+    
 
   // COMMENT: Explain the following four lines of code. How is the query built out? What information will be used to create the query?
   let query = ''
@@ -65,6 +70,7 @@ app.get('/api/v1/books/find', (req, res) => {
 })
 
 // COMMENT: How does this route differ from the route above? What does ':isbn' refer to in the code below?
+//in the route above, the page is being specified at a determined point ending in find; the find page. In the one below, the page url/path is being determined by the ISBN of the book that was found. It's generating it.
 app.get('/api/v1/books/find/:isbn', (req, res) => {
   let url = 'https://www.googleapis.com/books/v1/volumes';
   superagent.get(url)

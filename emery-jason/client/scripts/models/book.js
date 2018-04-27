@@ -61,6 +61,7 @@ ENV.apiUrl = ENV.isProduction ? ENV.productionApiUrl : ENV.developmentApiUrl;
     .catch(errorCallback)
 
   // COMMENT: Where is this method invoked? What is passed in as the 'book' argument when invoked? What callback will be invoked after Book.loadAll is invoked?
+  //It's being invoked inline; IIFE. And it's being called in the initiate search function.
   Book.find = (book, callback) =>
     $.get(`${ENV.apiUrl}/api/v1/books/find`, book)
       .then(Book.loadAll)
@@ -68,6 +69,7 @@ ENV.apiUrl = ENV.isProduction ? ENV.productionApiUrl : ENV.developmentApiUrl;
       .catch(errorCallback)
 
   // COMMENT: Where is this method invoked? How does it differ from the Book.find method, above?
+  //its invoked on page load because it's wrapped in an IFFE. It's also being called in book-view when search results are invoked.
   Book.findOne = isbn =>
     $.get(`${ENV.apiUrl}/api/v1/books/find/${isbn}`)
     .then(Book.create)

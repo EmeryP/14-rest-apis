@@ -82,14 +82,18 @@ var app = app || {};
   };
 
 // COMMENT: What is the purpose of this method?
+// resetView is clearing the page to make room for the new display
+//and then the following jquery sets the divs we want to display, and sets up a listener so that whenthey click te search function is called.
   bookView.initSearchFormPage = function() {
     resetView();
     $('.search-view').show();
     $('#search-form').on('submit', function(event) {
       // COMMENT: What default behavior is being prevented here?
+      // page refresh is being prevented, which would reload everyting, probably clear the form, and have to make a new server request/page redraw which we don't want.
       event.preventDefault();
 
       // COMMENT: What is the event.target, below? What will happen if the user does not provide the information needed for the title, author, or isbn properties?
+      //it's going to grab whatever value evals to true, and so if you put nothing in, || will assign '' to the value to be searched.
       let book = {
         title: event.target.title.value || '',
         author: event.target.author.value || '',
@@ -99,6 +103,7 @@ var app = app || {};
       module.Book.find(book, bookView.initSearchResultsPage);
 
       // COMMENT: Why are these values set to an empty string?
+      //it clears the form after you hit the search function, to clear it out. 
       event.target.title.value = '';
       event.target.author.value = '';
       event.target.isbn.value = '';
@@ -106,16 +111,19 @@ var app = app || {};
   }
 
   // COMMENT: What is the purpose of this method?
+  //the purpose is to reset the view, which clears the page, then shows the search results class, and then empties the search-list to be repopulated.
   bookView.initSearchResultsPage = function() {
     resetView();
     $('.search-results').show();
     $('#search-list').empty();
 
     // COMMENT: Explain how the .forEach() method is being used below.
+    //the for each method is appending each book item to the html element with id search-list.
     module.Book.all.forEach(book => $('#search-list').append(book.toHtml()));
     $('.detail-button a').text('Add to list').attr('href', '/');
     $('.detail-button').on('click', function(e) {
       // COMMENT: Explain the following line of code.
+      //data() is returning the value of the stored bookid of the great grand paent of the contextual this [which is: the Book object], which is all being passed into findOne to isolate one book to render based on that bookid/which is the ISBN.
       module.Book.findOne($(this).parent().parent().parent().data('bookid'))
     });
   }
