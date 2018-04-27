@@ -14,6 +14,7 @@ const CLIENT_URL = process.env.CLIENT_URL;
 const TOKEN = process.env.TOKEN;
 
 // COMMENT: Explain the following line of code. What is the API_KEY? Where did it come from?
+//The API KEY is the secret key we received from Google that will allows us authorized access to their books database
 const API_KEY = process.env.GOOGLE_API_KEY;
 
 // Database Setup
@@ -27,35 +28,36 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
 // API Endpoints
-// app.get('/api/v1/books/find/')
-
 app.get('/api/v1/admin', (req, res) => res.send(TOKEN === parseInt(req.query.token)))
 
 app.get('/api/v1/books/find', (req, res) => {
   let url = 'https://www.googleapis.com/books/v1/volumes';
-  // superagent.get(url)
-  //   .set('Authoriation', `token ${process.env.GOOGLE_API_KEY}`)
-    
 
   // COMMENT: Explain the following four lines of code. How is the query built out? What information will be used to create the query?
+  //the first line says, let query = a blank string that will be populated based on which of the following lines evalutes to being true. The info will come from the request object and be equal to the value of the title, author, or isbn.
   let query = ''
   if(req.query.title) query += `+intitle:${req.query.title}`;
   if(req.query.author) query += `+inauthor:${req.query.author}`;
   if(req.query.isbn) query += `+isbn:${req.query.isbn}`;
 
   // COMMENT: What is superagent? How is it being used here? What other libraries are available that could be used for the same purpose?
+  //Superagent is an express library we use to assist in authorization. OAuth2-client-js is a library we could pull use instead. 
   superagent.get(url)
     .query({'q': query})
     .query({'key': API_KEY})
     .then(response => response.body.items.map((book, idx) => {
 
       // COMMENT: The line below is an example of destructuring. Explain destructuring in your own words.
+      //MDN: The destructuring assignment syntax is a JavaScript expression that makes it possible to unpack values from arrays, or properties from objects, into distinct variables.
+      //OUR WORDS: we are using destructing to unpack the distinct values from the volume of books we are querying at GoogleBooks
       let { title, authors, industryIdentifiers, imageLinks, description } = book.volumeInfo;
 
       // COMMENT: What is the purpose of the following placeholder image?
+      //if the book doesnt have a cover available this will populate the space. 
       let placeholderImage = 'http://www.newyorkpaddy.com/images/covers/NoCoverAvailable.jpg';
 
       // COMMENT: Explain how ternary operators are being used below.
+      //Ternary operators are being used to populate fields in absense of information that would normally fill that space. 
       return {
         title: title ? title : 'No title available',
         author: authors ? authors[0] : 'No authors available',
